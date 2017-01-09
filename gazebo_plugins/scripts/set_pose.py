@@ -34,23 +34,35 @@
 
 ## Gazebo send position topic or calls set pose service for ros_sim_iface consumption
 
-PKG = 'gazebo_plugins'
+#PKG = 'gazebo_plugins'
 NAME = 'set_pose'
 
 import math
-import roslib
-roslib.load_manifest(PKG)
+####            ROS1 Code                       ####
+#import roslib
+#roslib.load_manifest(PKG)
+
+import sys
+from time import sleep
+
+import rclpy
+
+from std_msgs.msg import String
+
 
 import sys, unittest
 import os, os.path, threading, time
-import rospy, rostest
+# import rospy, rostest
+import rclpy
 
 from gazebo_plugins.srv import SetPose
 
-from std_msgs.msg import String
+
 from geometry_msgs.msg import Pose,Quaternion,Point, PoseStamped, PoseWithCovariance, TwistWithCovariance, Twist, Vector3
 from nav_msgs.msg import Odometry
-import tf.transformations as tft
+#import tf.transformations as tft
+import tf2.transformations as tft
+
 from numpy import float64
 
 COV = [float64(0),float64(0),float64(0),float64(0),float64(0),float64(0), \
@@ -92,17 +104,21 @@ class SimIfaceControl():
     self.wait_topic_name = "clock"
     self.wait_for_topic = False;
 
-    rospy.init_node(NAME, anonymous=True)
+#    rospy.init_node(NAME, anonymous=True)
+    rclpy_init(NAME, anonymous=True)
 
   def setPoseService(self,pose_msg):
     print "waiting for service to set pose"
-    rospy.wait_for_service(self.service_name);
+    
+#    rospy.wait_for_service(self.service_name);Not available in rclpy.c ( // TODO(jacquelinekay) Services.)
+
+
     try:
-      set_pose = rospy.ServiceProxy(self.service_name, SetPose)
-      resp1 = set_pose(pose_msg)
-      return resp1.success
-    except rospy.ServiceException, e:
-      print "service call failed: %s"%e
+#      set_pose = rospy.ServiceProxy(self.service_name, SetPose) Mot available in rclpy.c rclpy.ServiceProxy
+#      resp1 = set_pose(pose_msg)
+#      return resp1.success
+#    except rospy.ServiceException, e:
+#      print "service call failed: %s"%e
 
   def waitTopicInput(self,p3d):
     #self.p3d_p = [p3d.pose.pose.position.x, p3d.pose.pose.position.y, p3d.pose.pose.position.z]
@@ -154,8 +170,11 @@ class SimIfaceControl():
           self.wait_for_topic = True;
 
     # setup rospy
-    self.pub_set_pose_topic = rospy.Publisher(self.topic_name, Odometry)
-    rospy.Subscriber(self.wait_topic_name, rospy.AnyMsg, self.waitTopicInput)
+#    self.pub_set_pose_topic = rospy.Publisher(self.topic_name, Odometry)
+    self.pub_set_pose_topic = rclpy_publish(self.topic_name, Odometry)
+    
+#    rospy.Subscriber(self.wait_topic_name, rospy.AnyMsg, self.waitTopicInput)
+    rclpy_create_subscription(self.wait_topic_name, rclpy_publish.AnyMsg, self.waitTopicInput) #Not sure if method is correct
 
     # wait for topic if user requests
     if self.wait_for_topic:
@@ -163,8 +182,12 @@ class SimIfaceControl():
         time.sleep(0.1)
 
     # compoose goal message
-    h = rospy.Header()
-    h.stamp = rospy.get_rostime()
+#    h = rospy.Header()
+    h = std_msgs.msg.Header()
+#    h.stamp = rospy.get_rostime()
+    h.stamp = time.time()   # Not sure if this is right?
+    # depending on specific timestamp can use the following import datetime
+    # st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     h.frame_id = self.frame_id
     p = Point(self.target_p[0],self.target_p[1],self.target_p[2])
     tmpq = tft.quaternion_from_euler(self.target_e[0],self.target_e[1],self.target_e[2])
@@ -181,7 +204,8 @@ class SimIfaceControl():
     # publish topic if specified
     if self.use_topic:
       timeout_t = time.time() + self.timeout
-      while not rospy.is_shutdown() and time.time() < timeout_t:
+#      while not rospy.is_shutdown() and time.time() < timeout_t:
+         while not rclpy_shutdown() and time.time() < timeout_t: # is_shutdwon same as shutdown
         # publish target pose
         self.pub_set_pose_topic.publish(target_pose)
 

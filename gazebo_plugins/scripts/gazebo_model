@@ -4,11 +4,17 @@
 # 
 # Provides quick access to the services exposed by gazebo_ros_factory plugin
 
-import roslib, time
-roslib.load_manifest('gazebo_plugins')
+####            ROS1 Code                       ####
+#import roslib; roslib.load_manifest('gazebo_plugins')
+#import rospy
 
-import rospy, sys
-import string
+import sys
+from time import sleep
+
+import rclpy
+
+from std_msgs.msg import String
+
 
 from gazebo_plugins import gazebo_plugins_interface
 from gazebo_plugins.msg import GazeboModel

@@ -34,19 +34,30 @@
 
 ## Gazebo send wrench topic for gazebo_ros_force consumption
 
-PKG = 'gazebo_plugins'
+#PKG = 'gazebo_plugins'
 NAME = 'set_wrench'
 
 import math
-import roslib
-roslib.load_manifest(PKG)
+
+####            ROS1 Code                       ####
+#import roslib
+#roslib.load_manifest(PKG)
+
+import sys
+from time import sleep
+
+import rclpy
+
+from std_msgs.msg import String
+
 
 import sys, unittest
 import os, os.path, threading, time
-import rospy, rostest
+# import rospy, rostest
+import rclpy
 
 from geometry_msgs.msg import Wrench, Vector3
-import tf.transformations as tft
+import tf2.transformations as tft
 from numpy import float64
 
 class SimIfaceControl():
@@ -56,7 +67,8 @@ class SimIfaceControl():
     self.target_e = [0,0,0] # angular
     self.topic_name = "set_wrench_topic"
     self.timeout=1
-    rospy.init_node(NAME, anonymous=True)
+#    rospy.init_node(NAME, anonymous=True)
+rclpy_init(NAME, anonymous=True)
 
   def setWrench(self):
     # get goal from commandline
@@ -90,14 +102,16 @@ class SimIfaceControl():
           self.topic_name = sys.argv[i+1]
 
     # setup rospy
-    self.pub_set_wrench_topic = rospy.Publisher(self.topic_name, Wrench)
+#    self.pub_set_wrench_topic = rospy.Publisher(self.topic_name, Wrench)
+self.pub_set_wrench_topic = rclpy_publish(self.topic_name, Wrench)
 
     # compoose goal message
     w = Wrench(Vector3(self.target_l[0],self.target_l[1],self.target_l[2]),Vector3(self.target_e[0],self.target_e[1],self.target_e[2]))
 
     # publish topic if specified
     timeout_t = time.time() + self.timeout
-    while not rospy.is_shutdown() and time.time() < timeout_t:
+#    while not rospy.is_shutdown() and time.time() < timeout_t:
+     while not rclpy.shutdown() and time.time() < timeout_t:
       # publish target wrench
       self.pub_set_wrench_topic.publish(w)
 
