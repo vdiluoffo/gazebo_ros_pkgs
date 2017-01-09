@@ -45,20 +45,24 @@
 #include <gazebo/physics/physics.hh>
 
 // ROS
-#include <ros/ros.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
-#include <geometry_msgs/Twist.h>
-#include <nav_msgs/Odometry.h>
-#include <nav_msgs/OccupancyGrid.h>
+#include <geometry_msgs/msg/Twist.h>
+#include <nav_msgs/msg/Odometry.h>
+#include <nav_msgs/msg/OccupancyGrid.h>
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h>  
 
 // Boost
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
+//#include <boost/thread.hpp>
+#include <thread>
 
 namespace gazebo {
 
@@ -97,15 +101,19 @@ namespace gazebo {
       physics::JointPtr joints[4];
 
       // ROS STUFF
-      ros::NodeHandle* rosnode_;
-      ros::Publisher odometry_publisher_;
-      ros::Subscriber cmd_vel_subscriber_;
+//      ros::NodeHandle* rosnode_;
+//      ros::Publisher odometry_publisher_;
+//      ros::Subscriber cmd_vel_subscriber_;
+      rclcpp::NodeHandle* rosnode_;
+      rclcpp::Publisher odometry_publisher_;
+      rclcpp::Subscriber cmd_vel_subscriber_;
       tf::TransformBroadcaster *transform_broadcaster_;
-      nav_msgs::Odometry odom_;
+      nav_msgs::msg::Odometry odom_;
       std::string tf_prefix_;
       bool broadcast_tf_;
 
-      boost::mutex lock;
+    //  private: boost::mutex lock;
+        private: std::mutex lock;
 
       std::string robot_namespace_;
       std::string command_topic_;
@@ -114,12 +122,14 @@ namespace gazebo {
       std::string robot_base_frame_;
 
       // Custom Callback Queue
-      ros::CallbackQueue queue_;
-      boost::thread callback_queue_thread_;
+//      ros::CallbackQueue queue_;
+//      boost::thread callback_queue_thread_;
+      callback queue_;
+      std::thread callback_queue_thread_;
       void QueueThread();
 
       // DiffDrive stuff
-      void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& cmd_msg);
+      void cmdVelCallback(const geometry_msgs::msg::Twist::ConstPtr& cmd_msg);
 
       double x_;
       double rot_;

@@ -23,7 +23,9 @@
 #ifndef GAZEBO_ROS_TEMPLATE_HH
 #define GAZEBO_ROS_TEMPLATE_HH
 
-#include <ros/ros.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>

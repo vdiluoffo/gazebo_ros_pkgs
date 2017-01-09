@@ -18,19 +18,21 @@
 #ifndef GAZEBO_ROS_PROSILICA_CAMERA_HH
 #define GAZEBO_ROS_PROSILICA_CAMERA_HH
 
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
+
 
 // library for processing camera data for gazebo / ros conversions
 #include <gazebo_plugins/gazebo_ros_camera_utils.h>
 #include <gazebo/plugins/CameraPlugin.hh>
 
 // ros
-#include <ros/callback_queue.h>
+//#include <ros/callback_queue.h>
 
 // image components
 #include <cv_bridge/cv_bridge.h>
 // used by polled_camera
-#include <sensor_msgs/RegionOfInterest.h>
+#include <sensor_msgs/msg/RegionOfInterest.h>
 
 // prosilica components
 // Stuff in image_common
@@ -73,12 +75,12 @@ class GazeboRosProsilica : public CameraPlugin, GazeboRosCameraUtils
 
   private: void pollCallback(polled_camera::GetPolledImage::Request& req,
                              polled_camera::GetPolledImage::Response& rsp,
-                             sensor_msgs::Image& image, sensor_msgs::CameraInfo& info);
+                             sensor_msgs::msg::Image& image, sensor_msgs::CameraInfo& info);
 
   /// \brief ros message
   /// \brief construct raw stereo message
-  private: sensor_msgs::Image *roiImageMsg;
-  private: sensor_msgs::CameraInfo *roiCameraInfoMsg;
+  private: sensor_msgs::msg::Image *roiImageMsg;
+  private: sensor_msgs::msg::CameraInfo *roiCameraInfoMsg;
 
   /// \brief ROS image topic name
   private: std::string pollServiceName;

@@ -26,14 +26,18 @@
 
 #include <string>
 
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
-#include <ros/ros.h>
-#include <nav_msgs/Odometry.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+#include <nav_msgs/msg/Odometry.h>
 
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+// #include <ros/callback_queue.h>
+// #include <ros/advertise_options.h>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -70,12 +74,15 @@ namespace gazebo
 
 
     /// \brief pointer to ros node
-    private: ros::NodeHandle* rosnode_;
-    private: ros::Publisher pub_;
-    private: PubQueue<nav_msgs::Odometry>::Ptr pub_Queue;
+   // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+   // private: ros::Publisher pub_;
+    private rclcpp::Publisher pub_;
+
+    private: PubQueue<nav_msgs::msg::Odometry>::Ptr pub_Queue;
 
     /// \brief ros message
-    private: nav_msgs::Odometry pose_msg_;
+    private: nav_msgs::msg::Odometry pose_msg_;
 
     /// \brief store bodyname
     private: std::string link_name_;
@@ -92,7 +99,8 @@ namespace gazebo
     private: math::Pose offset_;
 
     /// \brief mutex to lock access to fields used in message callbacks
-    private: boost::mutex lock;
+ //   private: boost::mutex lock;
+    private: std::mutex lock;
 
     /// \brief save last_time
     private: common::Time last_time_;
@@ -117,9 +125,11 @@ namespace gazebo
     /// \brief for setting ROS name space
     private: std::string robot_namespace_;
 
-    private: ros::CallbackQueue p3d_queue_;
+//    private: ros::CallbackQueue p3d_queue_;
+     private: callback p3d_queue_;
     private: void P3DQueueThread();
-    private: boost::thread callback_queue_thread_;
+//    private: boost::thread callback_queue_thread_;
+     private: std::thread callback_queue_thread_;
 
     // Pointer to the update event connection
     private: event::ConnectionPtr update_connection_;

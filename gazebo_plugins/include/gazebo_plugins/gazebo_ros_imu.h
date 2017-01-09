@@ -18,15 +18,20 @@
 #define GAZEBO_ROS_IMU_HH
 
 #include <string>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
-#include <sensor_msgs/Imu.h>
-#include <std_srvs/Empty.h>
+#//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h>  
+#include <sensor_msgs/msg/Imu.h>
+#include <std_srvs/srv/Empty.h>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
@@ -58,12 +63,15 @@ namespace gazebo
     private: physics::LinkPtr link;
 
     /// \brief pointer to ros node
-    private: ros::NodeHandle* rosnode_;
-    private: ros::Publisher pub_;
-    private: PubQueue<sensor_msgs::Imu>::Ptr pub_Queue;
+   // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+   // private: ros::Publisher pub_;
+    private rclcpp::Publisher pub_;
+
+    private: PubQueue<sensor_msgs::msg::Imu>::Ptr pub_Queue;
 
     /// \brief ros message
-    private: sensor_msgs::Imu imu_msg_;
+    private: sensor_msgs::msg::Imu imu_msg_;
 
     /// \brief store link name
     private: std::string link_name_;
@@ -104,15 +112,17 @@ namespace gazebo
     private: std::string robot_namespace_;
 
     /// \brief call back when using service
-    private: bool ServiceCallback(std_srvs::Empty::Request &req,
-                                  std_srvs::Empty::Response &res);
+    private: bool ServiceCallback(std_srvs::srv::Empty::Request &req,
+                                  std_srv::srv::Empty::Response &res);
 
-    private: ros::ServiceServer srv_;
+ //   private: ros::ServiceServer srv_; Need to find out replacement for this function
     private: std::string service_name_;
 
-    private: ros::CallbackQueue imu_queue_;
+   // private: ros::CallbackQueue imu_queue_;
+     private: callback imu_queue_;
     private: void IMUQueueThread();
-    private: boost::thread callback_queue_thread_;
+  //  private: boost::thread callback_queue_thread_;
+     private: std::thread callback_queue_thread_;
 
     // Pointer to the update event connection
     private: event::ConnectionPtr update_connection_;

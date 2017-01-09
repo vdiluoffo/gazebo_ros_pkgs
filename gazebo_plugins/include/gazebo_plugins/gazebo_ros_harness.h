@@ -18,12 +18,14 @@
 #define GAZEBO_ROS_HARNESS_H
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/subscribe_options.h>
+// #include <ros/callback_queue.h>
+// #include <ros/subscribe_options.h>
 
-#include <ros/ros.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Bool.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+#include <std_msgs/msg/Float32.h>
+#include <std_msgs/msg/Bool.h>
 
 #include <gazebo/plugins/HarnessPlugin.hh>
 
@@ -52,29 +54,35 @@ class GazeboRosHarness : public HarnessPlugin
 
     /// \brief Receive winch velocity control messages.
     /// \param[in] msg Float message that is the target winch velocity.
-    private: virtual void OnVelocity(const std_msgs::Float32::ConstPtr &msg);
+    private: virtual void OnVelocity(const std_msgs::msg::Float32::ConstPtr &msg);
 
     /// \brief Receive detach messages
     /// \param[in] msg Boolean detach message. Detach joints if data is
     /// true.
-    private: virtual void OnDetach(const std_msgs::Bool::ConstPtr &msg);
+    private: virtual void OnDetach(const std_msgs::msg::Bool::ConstPtr &msg);
 
     /// \brief Custom callback queue thread
     private: void QueueThread();
 
     /// \brief pointer to ros node
-    private: ros::NodeHandle *rosnode_;
+      // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+    
 
     /// \brief Subscriber to velocity control messages.
-    private: ros::Subscriber velocitySub_;
+  //  private: ros::Subscriber velocitySub_;
+   private: rclcpp::Subscriber velocitySub_;
 
     /// \brief Subscriber to detach control messages.
-    private: ros::Subscriber detachSub_;
+  //  private: ros::Subscriber detachSub_;
+   private: rclcpp::Subscriber detachSub_;
 
     /// \brief for setting ROS name space
     private: std::string robotNamespace_;
-    private: ros::CallbackQueue queue_;
-    private: boost::thread callbackQueueThread_;
+  //  private: ros::CallbackQueue queue_;
+    private: callback queue_;
+  //  private: boost::thread callbackQueueThread_;
+    private: std::thread callbackQueueThread_;
 };
 }
 #endif

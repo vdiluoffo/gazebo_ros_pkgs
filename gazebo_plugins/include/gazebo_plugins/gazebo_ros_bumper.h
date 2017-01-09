@@ -20,16 +20,20 @@
 
 #include <string>
 
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h>  
 
 #include <sys/time.h>
 
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
-#include <std_msgs/String.h>
+#include <std_msgs/msg/String.h>
 
 #include <gazebo_msgs/ContactState.h>
 #include <gazebo_msgs/ContactsState.h>
@@ -64,8 +68,10 @@ namespace gazebo
     private: void OnContact();
 
     /// \brief pointer to ros node
-    private: ros::NodeHandle* rosnode_;
-    private: ros::Publisher contact_pub_;
+//    private: ros::NodeHandle* rosnode_;
+    rcl_node_t * rcl_node;
+//    private: ros::Publisher contact_pub_;
+    private: rclcpp::Publisher contact_pub_;
 
     private: sensors::ContactSensorPtr parentSensor;
 
@@ -80,9 +86,11 @@ namespace gazebo
     /// \brief for setting ROS name space
     private: std::string robot_namespace_;
 
-    private: ros::CallbackQueue contact_queue_;
+//    private: ros::CallbackQueue contact_queue_; 
+    private: callback contact_queue_;;
     private: void ContactQueueThread();
-    private: boost::thread callback_queue_thread_;
+//    private: boost::thread callback_queue_thread_;
+     private: std::thread callback_queue_thread_;
 
     // Pointer to the update event connection
     private: event::ConnectionPtr update_connection_;

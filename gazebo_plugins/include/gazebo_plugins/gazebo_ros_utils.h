@@ -34,13 +34,15 @@
 #ifndef GAZEBO_ROS_UTILS_H
 #define GAZEBO_ROS_UTILS_H
 #include <map>
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp> //No stdlib equivalents
 
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/Sensor.hh>
 #include <gazebo/gazebo_config.h>
-#include <ros/ros.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
 
 #ifndef GAZEBO_SENSORS_USING_DYNAMIC_POINTER_CAST
 # if GAZEBO_MAJOR_VERSION >= 7
@@ -62,7 +64,9 @@ inline std::string GetModelName ( const sensors::SensorPtr &parent )
 {
     std::string modelName;
     std::vector<std::string> values;
+
     std::string scopedName = parent->ScopedName();
+
     boost::replace_all ( scopedName, "::", "," );
     boost::split ( values, scopedName, boost::is_any_of ( "," ) );
     if ( values.size() < 2 ) {
@@ -112,7 +116,8 @@ private:
     sdf::ElementPtr sdf_;       /// sdf to read
     std::string plugin_;        /// name of the plugin class
     std::string namespace_;     /// name of the launched node
-    boost::shared_ptr<ros::NodeHandle> rosnode_; /// rosnode
+//    boost::shared_ptr<ros::NodeHandle> rosnode_; /// rosnode
+    std::shared_ptr<rcl_node_t> rosnode_; /// rosnode   or should the rclcpp::Node::shared_ptr be used?
     std::string tf_prefix_;     /// prefix for the ros tf plublisher if not set it uses the namespace_
     std::string info_text;      /// info text for log messages to identify the node
     /**
@@ -139,7 +144,8 @@ public:
         }
         if ( !namespace_.empty() )
             this->namespace_ += "/";
-        rosnode_ = boost::shared_ptr<ros::NodeHandle> ( new ros::NodeHandle ( namespace_ ) );
+//        rosnode_ = boost::shared_ptr<ros::NodeHandle> ( new ros::NodeHandle ( namespace_ ) );
+         rosnode_ = std::shared_ptr<rcl_node_t> ( new rcl_node_t ( namespace_ ) ); // or should the rclcpp::Node::shared_ptr be used?
         info_text = plugin_ + "(ns = " + namespace_ + ")";
         readCommonParameter ();
     }
@@ -178,12 +184,15 @@ public:
      * returns the initialized created within the constuctor
      * @return rosnode
      **/
-    boost::shared_ptr<ros::NodeHandle>& node();;
+//    boost::shared_ptr<ros::NodeHandle>& node();
+      std::shared_ptr<rcl_node_t >& node(); // or should the rclcpp::Node::shared_ptr be used?
     /**
      * returns the initialized within the constuctor
      * @return rosnode
      **/
-    const boost::shared_ptr<ros::NodeHandle>& node() const;
+
+//    boost::shared_ptr<ros::NodeHandle>& node()const;
+      std::shared_ptr<rcl_node_t >& node()const; // or should the rclcpp::Node::shared_ptr be used?
     /**
      * resolves a tf frame name by adding the tf_prefix initialized within the constuctor
      * @param _name

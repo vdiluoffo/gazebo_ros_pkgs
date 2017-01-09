@@ -8,11 +8,13 @@
 #define GAZEBO_ROS_PROJECTOR_HH
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/subscribe_options.h>
-
-#include <ros/ros.h>
-#include <boost/thread/mutex.hpp>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h>  
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -22,8 +24,8 @@
 #include <gazebo/common/Events.hh>
 #include <gazebo/rendering/RenderTypes.hh>
 
-#include <std_msgs/String.h>
-#include <std_msgs/Int32.h>
+#include <std_msgs/msg/String.h>
+#include <std_msgs/msg/Int32.h>
 
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
@@ -89,15 +91,19 @@ class GazeboRosProjector : public ModelPlugin
   private: physics::WorldPtr world_;
 
   /// \brief Callback when a texture is published
-  private: void LoadImage(const std_msgs::String::ConstPtr& imageMsg);
+  private: void LoadImage(const std_msgs::msg::tring::ConstPtr& imageMsg);
 
   /// \brief Callbakc when a projector toggle is published
-  private: void ToggleProjector(const std_msgs::Int32::ConstPtr& projectorMsg);  
+  private: void ToggleProjector(const std_msgs::msg::Int32::ConstPtr& projectorMsg);  
 
   /// \brief A pointer to the ROS node.  A node will be instantiated if it does not exist.
-  private: ros::NodeHandle* rosnode_;
-  private: ros::Subscriber imageSubscriber_;
-  private: ros::Subscriber projectorSubscriber_;  
+   // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+//  private: ros::Subscriber imageSubscriber_;
+//  private: ros::Subscriber projectorSubscriber_;  
+    private: rclcpp::Subscriber imageSubscriber_;
+    private: rclcpp::Subscriber projectorSubscriber_;  
+
 
  /// \brief ROS texture topic name  
   private: std::string texture_topic_name_;
@@ -109,9 +115,11 @@ class GazeboRosProjector : public ModelPlugin
   private: std::string robot_namespace_;
 
   // Custom Callback Queue
-  private: ros::CallbackQueue queue_;
+//  private: ros::CallbackQueue queue_;
+  private: callback queue_;
   private: void QueueThread();
-  private: boost::thread callback_queue_thread_;
+//  private: boost::thread callback_queue_thread_;
+  private: std::thread callback_queue_thread_;
 
   private: event::ConnectionPtr add_model_event_;
 
