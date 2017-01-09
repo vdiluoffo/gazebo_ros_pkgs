@@ -54,9 +54,12 @@ namespace gazebo
     /// Bookkeeping flags that will be passed into the underlying
     /// GazeboRosCameraUtils objects to let them share state about the parent
     /// sensor.
-    private: boost::shared_ptr<int> image_connect_count_;
-    private: boost::shared_ptr<boost::mutex> image_connect_count_lock_;
-    private: boost::shared_ptr<bool> was_active_;
+//    private: boost::shared_ptr<int> image_connect_count_;
+//    private: boost::shared_ptr<boost::mutex> image_connect_count_lock_;
+//    private: boost::shared_ptr<bool> was_active_;
+        private: std::shared_ptr<int> image_connect_count_;
+        private: std::shared_ptr<boost::mutex> image_connect_count_lock_;
+        private: std::shared_ptr<bool> was_active_;
   };
 }
 #endif

@@ -26,14 +26,18 @@
 #include <string>
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
-#include <ros/advertise_service_options.h>
+// #include <ros/callback_queue.h>
+// #include <ros/advertise_options.h>
+// #include <ros/advertise_service_options.h>
 #include <std_srvs/Empty.h>
 
-#include <ros/ros.h>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -125,13 +129,18 @@ class GazeboRosVacuumGripper : public ModelPlugin
   private: physics::LinkPtr link_;
 
   /// \brief A pointer to the ROS node.  A node will be instantiated if it does not exist.
-  private: ros::NodeHandle* rosnode_;
+    // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
 
   /// \brief A mutex to lock access to fields that are used in ROS message callbacks
-  private: boost::mutex lock_;
-  private: ros::Publisher pub_;
-  private: ros::ServiceServer srv1_;
-  private: ros::ServiceServer srv2_;
+//  private: boost::mutex lock_;
+//  private: ros::Publisher pub_;
+//  private: ros::ServiceServer srv1_;
+//  private: ros::ServiceServer srv2_;
+  private: std::mutex lock_;
+  private: rclcpp::Publisher pub_;
+  private: rclcpp::ServiceServer srv1_;
+  private: rclcpp::ServiceServer srv2_;
 
   /// \brief ROS Wrench topic name inputs
   private: std::string topic_name_;
@@ -143,9 +152,11 @@ class GazeboRosVacuumGripper : public ModelPlugin
   private: std::string robot_namespace_;
 
   // Custom Callback Queue
-  private: ros::CallbackQueue queue_;
+//  private: ros::CallbackQueue queue_;
+    private: callback queue_;
   /// \brief Thead object for the running callback Thread.
-  private: boost::thread callback_queue_thread_;
+//  private: boost::thread callback_queue_thread_;
+    private: std::thread callback_queue_thread_;
 
   // Pointer to the update event connection
   private: event::ConnectionPtr update_connection_;

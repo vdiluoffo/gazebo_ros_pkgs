@@ -35,14 +35,17 @@
 #ifndef VISION_RECONFIGURE_HH
 #define VISION_RECONFIGURE_HH
 
-#include <ros/ros.h>
-#include <std_msgs/Header.h>
-#include <std_msgs/Int32.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+#include <std_msgs/msg/Header.h>
+#include <std_msgs/msg/Int32.h>
 #include <dynamic_reconfigure/server.h>
-#include <boost/thread/thread.hpp>
+//#include <boost/thread.hpp>
+#include <thread>
 #include <gazebo_plugins/CameraSynchronizerConfig.h>
 
-#include <ros/callback_queue.h>
+// #include <ros/callback_queue.h>
 
 class VisionReconfigure
 {
@@ -57,13 +60,19 @@ class VisionReconfigure
     void spin(double spin_frequency);
 
   private:
-    ros::NodeHandle nh_;
-    ros::Publisher pub_projector_;
-    ros::Publisher pub_header_;
+//    ros::NodeHandle nh_;
+//    ros::Publisher pub_projector_;
+//    ros::Publisher pub_header_;
+    
+    rcl_node_t nh_; // or should the rclcpp::Node::shared_ptr be used?
+    rclcpp::Publisher pub_projector_;
+    rclcpp::Publisher pub_header_;    
     dynamic_reconfigure::Server<gazebo_plugins::CameraSynchronizerConfig> srv_;
-    std_msgs::Int32 projector_msg_;
-    ros::CallbackQueue queue_;
-    boost::thread callback_queue_thread_;
+    std_msgs::msg::Int32 projector_msg_;
+//    ros::CallbackQueue queue_;
+    callback queue_;
+//    boost::thread callback_queue_thread_;
+    std::thread callback_queue_thread_;
 
 };
 

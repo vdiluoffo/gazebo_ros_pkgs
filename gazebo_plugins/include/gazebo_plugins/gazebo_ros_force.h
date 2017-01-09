@@ -26,13 +26,17 @@
 #include <string>
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/subscribe_options.h>
-#include <geometry_msgs/Wrench.h>
+// #include <ros/callback_queue.h>
+// #include <ros/subscribe_options.h>
+#include <geometry_msgs/msg/Wrench.h>
 
-#include <ros/ros.h>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -84,7 +88,7 @@ class GazeboRosForce : public ModelPlugin
 
   /// \brief call back when a Wrench message is published
   /// \param[in] _msg The Incoming ROS message representing the new force to exert.
-  private: void UpdateObjectForce(const geometry_msgs::Wrench::ConstPtr& _msg);
+  private: void UpdateObjectForce(const geometry_msgs::msg::Wrench::ConstPtr& _msg);
 
   /// \brief The custom callback queue thread function.
   private: void QueueThread();
@@ -112,10 +116,12 @@ class GazeboRosForce : public ModelPlugin
 
   // Custom Callback Queue
   private: ros::CallbackQueue queue_;
+  private: callback queue_;
   /// \brief Thead object for the running callback Thread.
-  private: boost::thread callback_queue_thread_;
+//  private: boost::thread callback_queue_thread_;
+  private: std::thread callback_queue_thread_;
   /// \brief Container for the wrench force that this plugin exerts on the body.
-  private: geometry_msgs::Wrench wrench_msg_;
+  private: geometry_msgs::msg:::Wrench wrench_msg_;
 
   // Pointer to the update event connection
   private: event::ConnectionPtr update_connection_;

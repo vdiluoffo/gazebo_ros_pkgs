@@ -24,18 +24,22 @@
 #define GAZEBO_ROS_F3D_HH
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+// #include <ros/callback_queue.h>
+// #include <ros/advertise_options.h>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/common/Events.hh>
 
-#include <ros/ros.h>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <geometry_msgs/WrenchStamped.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
+#include <geometry_msgs/msg/WrenchStamped.h>
 
 namespace gazebo
 {
@@ -64,11 +68,14 @@ class GazeboRosF3D : public ModelPlugin
 
 
   /// \brief A pointer to the ROS node.  A node will be instantiated if it does not exist.
-  private: ros::NodeHandle* rosnode_;
-  private: ros::Publisher pub_;
+//  private: ros::NodeHandle* rosnode_;
+   private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+   
+ // private: ros::Publisher pub_;
+ private: rclcpp::Publisher pub_;
 
   /// \brief ROS WrenchStamped message
-  private: geometry_msgs::WrenchStamped wrench_msg_;
+  private: geometry_msgs::msg::WrenchStamped wrench_msg_;
 
   /// \brief store bodyname
   private: std::string link_name_;
@@ -84,7 +91,8 @@ class GazeboRosF3D : public ModelPlugin
   private: std::string robot_namespace_;
 
   /// \brief A mutex to lock access to fields that are used in message callbacks
-  private: boost::mutex lock_;
+//  private: boost::mutex lock_;
+  private: std::mutex lock_;
 
   /// \brief: keep track of number of connections
   private: int f3d_connect_count_;
@@ -92,9 +100,12 @@ class GazeboRosF3D : public ModelPlugin
   private: void F3DDisconnect();
 
   // Custom Callback Queue
-  private: ros::CallbackQueue queue_;
+//  private: ros::CallbackQueue queue_;
+     private callback queue_;
   private: void QueueThread();
-  private: boost::thread callback_queue_thread_;
+//  private: boost::thread callback_queue_thread_;
+  private: std::thread callback_queue_thread_;
+
 
   // Pointer to the update event connection
   private: event::ConnectionPtr update_connection_;

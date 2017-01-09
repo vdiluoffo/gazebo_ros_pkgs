@@ -49,21 +49,25 @@
 #include <gazebo_plugins/gazebo_ros_utils.h>
 
 // ROS
-#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Pose2D.h>
+#include <geometry_msgs/msg/Twist.h>
+#include <geometry_msgs/msg/Pose2D.h>
 #include <nav_msgs/Odometry.h>
-#include <sensor_msgs/JointState.h>
+#include <sensor_msgs/msg/JointState.h>
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+//#include <ros/callback_queue.h>
+//#include <ros/advertise_options.h>
 
 // Boost
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
+//#include <boost/thread.hpp>
+#include <thread>
 
 namespace gazebo {
 
@@ -109,15 +113,20 @@ namespace gazebo {
       std::vector<physics::JointPtr> joints_;
 
       // ROS STUFF
-      ros::Publisher odometry_publisher_;
-      ros::Subscriber cmd_vel_subscriber_;
-      boost::shared_ptr<tf::TransformBroadcaster> transform_broadcaster_;
-      sensor_msgs::JointState joint_state_;
-      ros::Publisher joint_state_publisher_;      
-      nav_msgs::Odometry odom_;
+  //    ros::Publisher odometry_publisher_;
+      rclcpp::Publisher odometry_publisher_;
+  //    ros::Subscriber cmd_vel_subscriber_;
+      rclcpp::Subscriber cmd_vel_subscriber_;
+  //    boost::shared_ptr<tf::TransformBroadcaster> transform_broadcaster_;
+      std::shared_ptr<tf::TransformBroadcaster> transform_broadcaster_;
+      sensor_msgs::msg::JointState joint_state_;
+  //    ros::Publisher joint_state_publisher_;  
+      rclcpp::Publisher joint_state_publisher_; 
+      nav_msgs::msg::Odometry odom_;
       std::string tf_prefix_;
 
-      boost::mutex lock;
+    //  boost::mutex lock;
+      std::mutex lock;
 
       std::string robot_namespace_;
       std::string command_topic_;
@@ -127,12 +136,14 @@ namespace gazebo {
       bool publish_tf_;
       bool legacy_mode_;
       // Custom Callback Queue
-      ros::CallbackQueue queue_;
-      boost::thread callback_queue_thread_;
+    //  ros::CallbackQueue queue_;
+      private: callback queue_;
+    //  boost::thread callback_queue_thread_;
+      private: std::thread callback_queue_thread_;
       void QueueThread();
 
       // DiffDrive stuff
-      void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& cmd_msg);
+      void cmdVelCallback(const geometry_msgs::msg::Twist::ConstPtr& cmd_msg);
 
       double x_;
       double rot_;
@@ -144,7 +155,7 @@ namespace gazebo {
       common::Time last_update_time_;
       
       OdomSource odom_source_;
-      geometry_msgs::Pose2D pose_encoder_;
+      geometry_msgs::msg::Pose2D pose_encoder_;
       common::Time last_odom_update_;
       
     // Flags

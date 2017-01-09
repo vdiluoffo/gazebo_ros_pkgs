@@ -20,12 +20,16 @@
 
 #include <string>
 
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
+//#include <boost/thread.hpp>
+#include <thread>
 
-#include <ros/ros.h>
-#include <ros/advertise_options.h>
-#include <sensor_msgs/LaserScan.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+// #include <ros/advertise_options.h>
+#include <sensor_msgs/msg/LaserScan.h>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -66,9 +70,12 @@ namespace gazebo
     private: sensors::GpuRaySensorPtr parent_ray_sensor_;
 
     /// \brief pointer to ros node
-    private: ros::NodeHandle* rosnode_;
-    private: ros::Publisher pub_;
-    private: PubQueue<sensor_msgs::LaserScan>::Ptr pub_queue_;
+   // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+   // private: ros::Publisher pub_;
+    private rclcpp::Publisher pub_;
+
+    private: PubQueue<sensor_msgs::msg::LaserScan>::Ptr pub_queue_;
 
     /// \brief topic name
     private: std::string topic_name_;
@@ -85,7 +92,8 @@ namespace gazebo
     // deferred load in case ros is blocking
     private: sdf::ElementPtr sdf;
     private: void LoadThread();
-    private: boost::thread deferred_load_thread_;
+ //   private: boost::thread deferred_load_thread_;
+     private: std::thread deferred_load_thread_;
     private: unsigned int seed;
 
     private: gazebo::transport::NodePtr gazebo_node_;

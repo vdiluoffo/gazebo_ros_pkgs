@@ -24,10 +24,12 @@
 #include <gazebo/plugins/ElevatorPlugin.hh>
 
 // ROS
-#include <ros/ros.h>
-#include <std_msgs/String.h>
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+// #include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+#include <std_msgs/msg/String.h>
+// #include <ros/callback_queue.h>
+// #include <ros/advertise_options.h>
 
 namespace gazebo
 {
@@ -47,7 +49,7 @@ namespace gazebo
 
     /// \brief Receives messages on the elevator's topic.
     /// \param[in] _msg The string message that contains a command.
-    public: void OnElevator(const std_msgs::String::ConstPtr &_msg);
+    public: void OnElevator(const std_msgs::msg::String::ConstPtr &_msg);
 
     /// \brief Queu to handle callbacks.
     private: void QueueThread();
@@ -56,16 +58,20 @@ namespace gazebo
     private: std::string robotNamespace_;
 
     /// \brief ros node handle
-    private: ros::NodeHandle *rosnode_;
+  //  private: ros::NodeHandle *rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
 
     /// \brief Subscribes to a topic that controls the elevator.
-    private: ros::Subscriber elevatorSub_;
+   // private: ros::Subscriber elevatorSub_;
+   private: rclcpp::Subscriber elevatorSub_;
 
     /// \brief Custom Callback Queue
-    private: ros::CallbackQueue queue_;
+  //  private: ros::CallbackQueue queue_;
+    private: callback queue_;
 
     // \brief Custom Callback Queue thread
-    private: boost::thread callbackQueueThread_;
+  //  private: boost::thread callbackQueueThread_;
+    private: std::thread callback_queue_thread_;
   };
 }
 #endif

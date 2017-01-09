@@ -1,65 +1,57 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
+
 project(gazebo_msgs)
 
-find_package(catkin REQUIRED COMPONENTS
-  std_msgs
-  trajectory_msgs
-  geometry_msgs
-  sensor_msgs
-  std_srvs
-  message_generation
-  )
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+endif()
 
-add_message_files(
-  DIRECTORY msg
-  FILES
-  ContactsState.msg
-  ContactState.msg
-  LinkState.msg
-  LinkStates.msg
-  ModelState.msg
-  ModelStates.msg
-  ODEJointProperties.msg
-  ODEPhysics.msg
-  WorldState.msg
-  )
 
-add_service_files(DIRECTORY srv FILES
-  ApplyBodyWrench.srv
-  DeleteModel.srv
-  GetLinkState.srv
-  GetPhysicsProperties.srv
-  SetJointProperties.srv
-  SetModelConfiguration.srv
-  SpawnModel.srv
-  ApplyJointEffort.srv
-  GetJointProperties.srv
-  GetModelProperties.srv
-  GetWorldProperties.srv
-  SetLinkProperties.srv
-  SetModelState.srv
-  BodyRequest.srv
-  GetLinkProperties.srv
-  GetModelState.srv
-  JointRequest.srv
-  SetLinkState.srv
-  SetPhysicsProperties.srv
-  SetJointTrajectory.srv
-  )
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rmw_implementation_cmake REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(message_generation REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
-generate_messages(DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  sensor_msgs
-  trajectory_msgs
-  )
+# message and service generation
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/ContactsState.msg"
+  "msg/ContactState.msg"
+  "msg/LinkState.msg"
+  "msg/LinkStates.msg"
+  "msg/ModelState.msg"
+  "msg/ModelStates.msg"
+  "msg/ODEJointProperties.msg"
+  "msg/ODEPhysics.msg"
+  "msg/WorldState.msg"
+   "srv/ApplyBodyWrench.srv"
+   "srv/DeleteModel.srv"
+   "srv/GetLinkState.srv"
+   "srv/GetPhysicsProperties.srv"
+   "srv/SetJointProperties.srv"
+   "srv/SetModelConfiguration.srv"
+   "srv/SpawnModel.srv"
+   "srv/ApplyJointEffort.srv"
+   "srv/GetJointProperties.srv"
+   "srv/GetModelProperties.srv"
+   "srv/GetWorldProperties.srv"
+   "srv/SetLinkProperties.srv"
+   "srv/SetModelState.srv"
+   "srv/BodyRequest.srv"
+   "srv/GetLinkProperties.srv"
+   "srv/GetModelState.srv"
+   "srv/JointRequest.srv"
+   "srv/SetLinkState.srv"
+   "srv/SetPhysicsProperties.srv"
+   "srv/SetJointTrajectory.srv"
+   DEPENDENCIES builtin_interfaces
+)
 
-catkin_package(
-  CATKIN_DEPENDS
-  message_runtime
-  std_msgs
-  trajectory_msgs
-  geometry_msgs
-  sensor_msgs
-  std_srvs
-  )
+
+ament_package()  

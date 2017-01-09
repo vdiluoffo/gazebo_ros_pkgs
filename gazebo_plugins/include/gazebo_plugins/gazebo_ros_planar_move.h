@@ -25,20 +25,24 @@
 #ifndef GAZEBO_ROS_PLANAR_MOVE_HH
 #define GAZEBO_ROS_PLANAR_MOVE_HH
 
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
+//#include <boost/thread.hpp>
+#include <thread>
 #include <map>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
 #include <sdf/sdf.hh>
 
-#include <geometry_msgs/Twist.h>
-#include <nav_msgs/OccupancyGrid.h>
-#include <nav_msgs/Odometry.h>
-#include <ros/advertise_options.h>
-#include <ros/callback_queue.h>
-#include <ros/ros.h>
+#include <geometry_msgs/msg/Twist.h>
+#include <nav_msgs/msg/OccupancyGrid.h>
+#include <nav_msgs/msg/Odometry.h>
+// #include <ros/advertise_options.h>
+// #include <ros/callback_queue.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
@@ -61,14 +65,21 @@ namespace gazebo {
       physics::ModelPtr parent_;
       event::ConnectionPtr update_connection_;
 
-      boost::shared_ptr<ros::NodeHandle> rosnode_;
-      ros::Publisher odometry_pub_;
-      ros::Subscriber vel_sub_;
-      boost::shared_ptr<tf::TransformBroadcaster> transform_broadcaster_;
-      nav_msgs::Odometry odom_;
+//      boost::shared_ptr<ros::NodeHandle> rosnode_;
+//      ros::Publisher odometry_pub_;
+//      ros::Subscriber vel_sub_;
+//      boost::shared_ptr<tf::TransformBroadcaster> transform_broadcaster_;
+      
+      std::shared_ptr<rcl_node_t > rosnode_; // or should the rclcpp::Node::shared_ptr be used?
+      rclcpp::Publisher odometry_pub_;
+      rclcpp::Subscriber vel_sub_;
+      std::shared_ptr<tf::TransformBroadcaster> transform_broadcaster_;
+      
+      nav_msgs::msg::Odometry odom_;
       std::string tf_prefix_;
 
-      boost::mutex lock;
+//      boost::mutex lock;
+           std::mutex lock;
 
       std::string robot_namespace_;
       std::string command_topic_;
@@ -78,12 +89,15 @@ namespace gazebo {
       double odometry_rate_;
 
       // Custom Callback Queue
-      ros::CallbackQueue queue_;
-      boost::thread callback_queue_thread_;
+//      ros::CallbackQueue queue_;
+//      boost::thread callback_queue_thread_;      
+      callback queue_;
+      std::thread callback_queue_thread_;
+      
       void QueueThread();
 
       // command velocity callback
-      void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& cmd_msg);
+      void cmdVelCallback(const geometry_msgs::msg::Twist::ConstPtr& cmd_msg);
 
       double x_;
       double y_;

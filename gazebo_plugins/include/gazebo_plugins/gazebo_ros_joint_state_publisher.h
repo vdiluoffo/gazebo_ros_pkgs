@@ -30,16 +30,19 @@
 #ifndef JOINT_STATE_PUBLISHER_PLUGIN_HH
 #define JOINT_STATE_PUBLISHER_PLUGIN_HH
 
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
 #include <stdio.h>
 
 // ROS
-#include <ros/ros.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
 #include <tf/transform_broadcaster.h>
-#include <sensor_msgs/JointState.h>
+#include <sensor_msgs/msg/JointState.h>
 
 // Usage in URDF:
 //   <gazebo>
@@ -69,9 +72,11 @@ private:
     std::vector<physics::JointPtr> joints_;
 
     // ROS STUFF
-    boost::shared_ptr<ros::NodeHandle> rosnode_;
-    sensor_msgs::JointState joint_state_;
-    ros::Publisher joint_state_publisher_;
+ //   boost::shared_ptr<ros::NodeHandle> rosnode_;
+     std::shared_ptr<rcl_node_t> rosnode_;  // or should the rclcpp::Node::shared_ptr be used?
+    sensor_msgs::msg::JointState joint_state_;
+ //   ros::Publisher joint_state_publisher_;
+     rclcpp::Publisher joint_state_publisher_;
     std::string tf_prefix_;
     std::string robot_namespace_;
     std::vector<std::string> joint_names_;

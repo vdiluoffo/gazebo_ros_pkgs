@@ -23,7 +23,9 @@
 #ifndef GAZEBO_ROS_TEMPLATE_HH
 #define GAZEBO_ROS_TEMPLATE_HH
 
-#include <ros/ros.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -53,9 +55,12 @@ namespace gazebo
 
   /// Pointer to the update event connection
   private: event::ConnectionPtr update_connection_;
-           boost::shared_ptr<tf2_ros::Buffer> tf_buffer_;
-           boost::shared_ptr<tf2_ros::TransformListener> tf_listener_;
-           boost::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+         //  boost::shared_ptr<tf2_ros::Buffer> tf_buffer_;
+            stdhared_ptr<tf2_ros::Buffer> tf_buffer_;
+        // boost::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+            stdhared_ptr<tf2_ros::TransformListener> tf_listener_;
+         //boost::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+            stdhared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
            physics::ModelPtr model_;
            physics::LinkPtr floating_link_;
            std::string link_name_;

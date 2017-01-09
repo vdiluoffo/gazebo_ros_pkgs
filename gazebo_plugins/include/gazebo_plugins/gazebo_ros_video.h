@@ -24,14 +24,17 @@
 #ifndef GAZEBO_ROS_VIDEO_H
 #define GAZEBO_ROS_VIDEO_H
 
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/opencv.hpp>
-#include <ros/advertise_options.h>
-#include <ros/callback_queue.h>
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h> 
+#include <sensor_msgs/msg/Image.h>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
@@ -64,7 +67,7 @@ namespace gazebo
       virtual ~GazeboRosVideo();
 
       void Load(rendering::VisualPtr parent, sdf::ElementPtr sdf);
-      void processImage(const sensor_msgs::ImageConstPtr &msg);
+      void processImage(const sensor_msgs::msg::ImageConstPtr &msg);
 
     protected:
 
@@ -75,20 +78,26 @@ namespace gazebo
       // Pointer to the update event connection
       event::ConnectionPtr update_connection_;
 
-      boost::shared_ptr<VideoVisual> video_visual_;
+//      boost::shared_ptr<VideoVisual> video_visual_;
+        std::shared_ptr<VideoVisual> video_visual_;
 
       cv_bridge::CvImagePtr image_;
-      boost::mutex m_image_;
+//      boost::mutex m_image_;
+      std::mutex m_image_;
       bool new_image_available_;
 
       // ROS Stuff
-      boost::shared_ptr<ros::NodeHandle> rosnode_;
-      ros::Subscriber camera_subscriber_;
+//      boost::shared_ptr<ros::NodeHandle> rosnode_;
+//      ros::Subscriber camera_subscriber_;
+      std::shared_ptr<ros::NodeHandle> rosnode_;
+      rclcpp::Subscriber camera_subscriber_;
       std::string robot_namespace_;
       std::string topic_name_;
 
-      ros::CallbackQueue queue_;
-      boost::thread callback_queue_thread_;
+//      ros::CallbackQueue queue_;
+//      boost::thread callback_queue_thread_;
+      callback queue_;
+      std::thread callback_queue_thread_;
       void QueueThread();
 
   };

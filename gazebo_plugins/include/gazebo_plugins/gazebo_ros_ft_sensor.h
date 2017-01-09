@@ -24,18 +24,21 @@
 #define GAZEBO_ROS_FT_HH
 
 // Custom Callback Queue
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+// #include <ros/callback_queue.h>
+// #include <ros/advertise_options.h>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/common/Events.hh>
 
-#include <ros/ros.h>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <geometry_msgs/WrenchStamped.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
+#include <geometry_msgs/msg/WrenchStamped.h>
 
 namespace gazebo
 {
@@ -108,11 +111,13 @@ class GazeboRosFT : public ModelPlugin
   private: physics::WorldPtr world_;
 
   /// \brief A pointer to the ROS node. A node will be instantiated if it does not exist.
-  private: ros::NodeHandle* rosnode_;
-  private: ros::Publisher pub_;
+   // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+   // private: ros::Publisher pub_;
+    private rclcpp::Publisher pub_;
 
   /// \brief ROS WrenchStamped message
-  private: geometry_msgs::WrenchStamped wrench_msg_;
+  private: geometry_msgs::msg::WrenchStamped wrench_msg_;
 
   /// \brief store bodyname
   private: std::string joint_name_;
@@ -142,9 +147,13 @@ class GazeboRosFT : public ModelPlugin
   private: void FTDisconnect();
 
   // Custom Callback Queue
-  private: ros::CallbackQueue queue_;
+ // private: ros::CallbackQueue queue_;
+  private: callback queue_;
+  
   private: void QueueThread();
-  private: boost::thread callback_queue_thread_;
+ // private: boost::thread callback_queue_thread_;
+  private: std::thread callback_queue_thread_;
+
 
   // Pointer to the update event connection
   private: event::ConnectionPtr update_connection_;

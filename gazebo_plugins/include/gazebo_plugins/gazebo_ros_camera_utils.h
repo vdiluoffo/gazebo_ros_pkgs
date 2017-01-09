@@ -20,19 +20,24 @@
 
 #include <string>
 // boost stuff
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 // ros stuff
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h>  not being used in this file
+
 
 // ros messages stuff
-#include <sensor_msgs/PointCloud.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <std_msgs/Float64.h>
+#include <sensor_msgs/msg/PointCloud.h>
+#include <sensor_msgs/msg/Image.h>
+#include <sensor_msgs/msg/CameraInfo.h>
+#include <std_msgs/msg/Float64.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 
@@ -78,7 +83,8 @@ namespace gazebo
                       const std::string &_camera_name_suffix,
                       double _hack_baseline);
 
-    public: event::ConnectionPtr OnLoad(const boost::function<void()>&);
+  //  public: event::ConnectionPtr OnLoad(const boost::function<void()>&);
+    public: event::ConnectionPtr OnLoad(const std::function<void()>&);
 
     private: void Init();
 
@@ -88,29 +94,33 @@ namespace gazebo
       common::Time &last_update_time);
 
     /// \brief Keep track of number of image connections
-    protected: boost::shared_ptr<int> image_connect_count_;
+  //  protected: boost::shared_ptr<int> image_connect_count_;
+    protected: std::shared_ptrr<int> image_connect_count_;  
     /// \brief A mutex to lock access to image_connect_count_
-    protected: boost::shared_ptr<boost::mutex> image_connect_count_lock_;
+  //  protected: boost::shared_ptr<boost::mutex> image_connect_count_lock_;
+    protected: std::shared_ptrr<boost::mutex> image_connect_count_lock_;
     protected: void ImageConnect();
     protected: void ImageDisconnect();
 
     /// \brief Keep track when we activate this camera through ros
     /// subscription, was it already active?  resume state when
     /// unsubscribed.
-    protected: boost::shared_ptr<bool> was_active_;
+  //  protected: boost::shared_ptr<bool> was_active_;
+    protected: std::shared_ptrr<bool> was_active_;
 
     /// \brief: Camera modification functions
-    private: void SetHFOV(const std_msgs::Float64::ConstPtr& hfov);
-    private: void SetUpdateRate(const std_msgs::Float64::ConstPtr& update_rate);
+    private: void SetHFOV(const std_msg::msg::Float64::ConstPtr& hfov);
+    private: void SetUpdateRate(const std_msgs::msg::Float64::ConstPtr& update_rate);
 
     /// \brief A pointer to the ROS node.
     ///  A node will be instantiated if it does not exist.
-    protected: ros::NodeHandle* rosnode_;
+    // protected: ros::NodeHandle* rosnode_;
+    protected:  private: rcl_node_t * rcl_node;
     protected: image_transport::Publisher image_pub_;
     private: image_transport::ImageTransport* itnode_;
 
     /// \brief ROS image message
-    protected: sensor_msgs::Image image_msg_;
+    protected: sensor_msgs::msg::Image image_msg_;
 
     /// \brief for setting ROS name space
     private: std::string robot_namespace_;
@@ -125,7 +135,8 @@ namespace gazebo
     protected: std::string image_topic_name_;
 
     /// \brief Publish CameraInfo to the ROS topic
-    protected: void PublishCameraInfo(ros::Publisher camera_info_publisher);
+//    protected: void PublishCameraInfo(ros::Publisher camera_info_publisher);
+    protected: void PublishCameraInfo(rclcpp::Publisher camera_info_publisher);
     protected: void PublishCameraInfo(common::Time &last_update_time);
     protected: void PublishCameraInfo();
     /// \brief Keep track of number of connctions for CameraInfo
@@ -155,19 +166,23 @@ namespace gazebo
     protected: double distortion_t1_;
     protected: double distortion_t2_;
 
-    protected: boost::shared_ptr<camera_info_manager::CameraInfoManager> camera_info_manager_;
+ //   protected: boost::shared_ptr<camera_info_manager::CameraInfoManager> camera_info_manager_;
+    protected: std::shared_ptrr<camera_info_manager::CameraInfoManager> camera_info_manager_;
 
 
     /// \brief A mutex to lock access to fields
     /// that are used in ROS message callbacks
-    protected: boost::mutex lock_;
+//    protected: boost::mutex lock_;
+     protected: std::mutex lock;
 
     /// \brief size of image buffer
     protected: std::string type_;
     protected: int skip_;
 
-    private: ros::Subscriber cameraHFOVSubscriber_;
-    private: ros::Subscriber cameraUpdateRateSubscriber_;
+//    private: ros::Subscriber cameraHFOVSubscriber_;
+//    private: ros::Subscriber cameraUpdateRateSubscriber_;
+    private: rclcpp::Subscriber cameraHFOVSubscriber_;
+    private: rclcpp::Subscriber cameraUpdateRateSubscriber_;
 
     // Time last published, refrain from publish unless new image has
     // been rendered
@@ -177,10 +192,11 @@ namespace gazebo
     void configCallback(gazebo_plugins::GazeboRosCameraConfig &config,
       uint32_t level);
 
-    protected: ros::CallbackQueue camera_queue_;
+//    protected: ros::CallbackQueue camera_queue_;
+    protected: callback camera_queue_;
     protected: void CameraQueueThread();
-    protected: boost::thread callback_queue_thread_;
-
+//    protected: boost::thread callback_queue_thread_;
+    protected private: std::thread callback_queue_thread_;
 
     // copied from CameraPlugin
     protected: unsigned int width_, height_, depth_;
@@ -202,7 +218,8 @@ namespace gazebo
     // deferred load in case ros is blocking
     private: sdf::ElementPtr sdf;
     private: void LoadThread();
-    private: boost::thread deferred_load_thread_;
+//    private: boost::thread deferred_load_thread_;
+    private: std::thread deferred_load_thread_;
     private: event::EventT<void()> load_event_;
 
     /// \brief True if camera util is initialized

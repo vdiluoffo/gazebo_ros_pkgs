@@ -40,14 +40,19 @@
 
 #include <string>
 
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/bind.hpp>
+#include <functional>
+//#include <boost/thread.hpp>
+#include <thread>
+//#include <boost/thread/mutex.hpp>
+#include <mutex>
 
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <ros/advertise_options.h>
-#include <sensor_msgs/Range.h>
+//#include <ros/ros.h>
+#include "rcl/rcl.h"
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h> 
+//#include <ros/advertise_options.h>  
+#include <sensor_msgs/msg/Range.h>
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/TransportTypes.hh>
@@ -94,11 +99,13 @@ class GazeboRosRange : public RayPlugin
     private: sensors::RaySensorPtr parent_ray_sensor_;
 
     /// \brief pointer to ros node
-    private: ros::NodeHandle* rosnode_;
-    private: ros::Publisher pub_;
+   // private: ros::NodeHandle* rosnode_;
+    private: rcl_node_t * rcl_node; // or should the rclcpp::Node::shared_ptr be used?
+   // private: ros::Publisher pub_;
+    private rclcpp::Publisher pub_;
 
     /// \brief ros message
-    private: sensor_msgs::Range range_msg_;
+    private: sensor_msgs::msg::Range range_msg_;
 
     /// \brief topic name
     private: std::string topic_name_;
@@ -118,7 +125,8 @@ class GazeboRosRange : public RayPlugin
     private: double GaussianKernel(double mu, double sigma);
 
     /// \brief mutex to lock access to fields that are used in message callbacks
-    private: boost::mutex lock_;
+   //  private: boost::mutex lock;
+        private: std::mutex lock;
 
     /// \brief hack to mimic hokuyo intensity cutoff of 100
     private: double hokuyo_min_intensity_;
@@ -131,14 +139,17 @@ class GazeboRosRange : public RayPlugin
     /// \brief for setting ROS name space
     private: std::string robot_namespace_;
 
-    private: ros::CallbackQueue range_queue_;
+//  private: ros::CallbackQueue range_queue_; 
+    private: callback range_queue_;
     private: void RangeQueueThread();
-    private: boost::thread callback_queue_thread_;
+//   private: boost::thread callback_queue_thread_;
+     private: std::thread callback_queue_thread_;
 
     // deferred load in case ros is blocking
     private: sdf::ElementPtr sdf;
     private: void LoadThread();
-    private: boost::thread deferred_load_thread_;
+//    private: boost::thread deferred_load_thread_;
+    private: std::thread deferred_load_thread_;
     private: unsigned int seed;
 };
 }
