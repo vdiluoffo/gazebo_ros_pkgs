@@ -1,9 +1,9 @@
-#!/usr/bin/env python
-from distutils.core import setup
-from catkin_pkg.python_setup import generate_distutils_setup
+from setuptools import find_packages
+from setuptools import setup
 
-d = generate_distutils_setup()
-d['packages'] = ['gazebo_plugins']
-d['package_dir'] = {'':'src'}
-
-setup(**d)
+setup(
+    name='gazebo_plugins',
+    version='0.0.0',
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+)
